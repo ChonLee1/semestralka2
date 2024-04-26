@@ -1,3 +1,5 @@
+package bytosti;
+
 import fri.shapesge.Manazer;
 import fri.shapesge.Obrazok;
 import java.util.Random;
@@ -7,9 +9,8 @@ import java.util.Random;
  * @author Matej Ostrožovič
  * @version (a version number or a date)
  */
-public class Jelen {
-    private Obrazok zver;
-    private Manazer pohyb;
+public class Jelen implements Zver {
+    private Obrazok jelen;
     private Manazer manazer;
     private Random random;
     private int x;
@@ -18,18 +19,18 @@ public class Jelen {
     private boolean stav;
     private int casZmeni;
     /**
-     * Konštruktor triedy Zver na náhodnej pozícii.
+     * Konštruktor triedy bytosti.Zver na náhodnej pozícii.
      */
     public Jelen() {
-        this.zver = new Obrazok("Obrazky\\jelen_hore.png", this.x, this.y);
+        this.jelen = new Obrazok("Obrazky\\jelen_hore.png", this.x, this.y);
         this.random = new Random();
         this.manazer = new Manazer();
-        this.zver.zobraz();
+        this.jelen.zobraz();
         this.manazer.spravujObjekt(this);
         this.x = this.random.nextInt(450) + 100;
         this.y = this.random.nextInt(450) + 100;
-        this.zver.posunVodorovne(this.x);
-        this.zver.posunZvisle(this.y);
+        this.jelen.posunVodorovne(this.x);
+        this.jelen.posunZvisle(this.y);
         this.smer = this.random.nextInt(4);
         this.stav = true;
         this.casZmeni = 0;
@@ -40,12 +41,12 @@ public class Jelen {
      */
     public void pohybHore() {
         this.smer = 0;
-        this.zver.zmenObrazok("Obrazky\\jelen_hore.png");
+        this.jelen.zmenObrazok("Obrazky\\jelen_hore.png");
         if (this.y == 100) {
             this.y = 600;
-            this.zver.posunZvisle(500);
+            this.jelen.posunZvisle(500);
         } else {
-            this.zver.posunZvisle(-1);
+            this.jelen.posunZvisle(-1);
             this.y -= 1;
         }   
     }
@@ -55,12 +56,12 @@ public class Jelen {
      */
     public void pohybDolu() {
         this.smer = 2;
-        this.zver.zmenObrazok("Obrazky\\jelen_dole.png");
+        this.jelen.zmenObrazok("Obrazky\\jelen_dole.png");
         if (this.y == 600) {
             this.y = 100;
-            this.zver.posunZvisle(-500);
+            this.jelen.posunZvisle(-500);
         } else {
-            this.zver.posunZvisle(1);
+            this.jelen.posunZvisle(1);
             this.y += 1;
         }    
     }
@@ -70,12 +71,12 @@ public class Jelen {
      */
     public void pohybVpravo() {
         this.smer = 1;
-        this.zver.zmenObrazok("Obrazky\\jelen_vpravo.png");
+        this.jelen.zmenObrazok("Obrazky\\jelen_vpravo.png");
         if (this.x == 800) {
             this.x = 0;
-            this.zver.posunVodorovne(-800);
+            this.jelen.posunVodorovne(-800);
         } else {
-            this.zver.posunVodorovne(1);
+            this.jelen.posunVodorovne(1);
             this.x += 1;
         }
     }
@@ -85,12 +86,12 @@ public class Jelen {
      */
     public void pohybVlavo() {
         this.smer = 3;
-        this.zver.zmenObrazok("Obrazky\\jelen_vlavo.png");
+        this.jelen.zmenObrazok("Obrazky\\jelen_vlavo.png");
         if (this.x == 0) {
             this.x = 600;
-            this.zver.posunVodorovne(600);
+            this.jelen.posunVodorovne(600);
         } else {
-            this.zver.posunVodorovne(-1);
+            this.jelen.posunVodorovne(-1);
             this.x -= 1;
         }
     }
@@ -132,7 +133,7 @@ public class Jelen {
      * 
      * @return int vracia x-ovú pozíciu zveri.
      */
-    public int getPoziciaZverX() {
+    public int getPoziciaX() {
         return this.x;
     }
 
@@ -141,7 +142,7 @@ public class Jelen {
      * 
      * @return int vracia y-ovú pozíciu zveri.
      */
-    public int getPoziciaZverY() {
+    public int getPoziciaY() {
         return this.y;
     }
 
@@ -158,7 +159,7 @@ public class Jelen {
      * Metóda, vykoná potrebné kroky na odstránenie zveri.
      */
     public void zabitaZver() {
-        this.zver.zmenObrazok("obrazky\\mrtvy_jelen.png");
+        this.jelen.zmenObrazok("Obrazky\\mrtvy_jelen.png");
         this.manazer.prestanSpravovatObjekt(this);
         this.stav = false;
     }
@@ -167,6 +168,6 @@ public class Jelen {
      * Metóda, ktorá schová obrázok z plátna.
      */
     public void skryZver() {
-        this.zver.skry();
+        this.jelen.skry();
     }
 }

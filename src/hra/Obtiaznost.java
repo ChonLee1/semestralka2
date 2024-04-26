@@ -1,6 +1,7 @@
+package hra;
 
 /**
- * Enumericka trieda Obtiaznost - obsahuje 3 obtažnosti pre triedu Hra.
+ * Enumericka trieda hra.Obtiaznost - obsahuje 3 obtažnosti pre triedu hra.Hra.
  * 
  * @author Matej Ostrožovič
  * @version (version number or date here)
@@ -15,7 +16,7 @@ public enum Obtiaznost {
     private final int cas;
 
     /**
-     * Konštruktor triedy Obtiaznost.
+     * Konštruktor triedy hra.Obtiaznost.
      */
     Obtiaznost (int novyCas) {
         this.cas = novyCas;

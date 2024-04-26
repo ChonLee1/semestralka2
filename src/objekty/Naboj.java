@@ -1,36 +1,40 @@
-import fri.shapesge.Obdlznik;
+package objekty;
+
+import fri.shapesge.Kruh;
 import fri.shapesge.Manazer;
+import hra.Smer;
+
 /**
  * Trieda ktora vytvara sip.
  * 
  * @author Matej Ostrožovič
  * @version (a version number or a date)
  */
-public class Sip {
-    private Obdlznik sip;
+public class Naboj {
+    private Kruh naboj;
     private int poziciaX;
     private int poziciaY;
     private Smer smer;
     private Manazer let;
     private boolean stav;
     /**
-     * Konštruktor triedy Sip na pozícii zadanej z parametrov x a y.
+     * Konštruktor triedy objekty.Sip na pozícii zadanej z parametrov x a y.
      * 
      * @param int zadáva pozíciu, kde sa má zobraziť na ose x.
      * @param int zadáva pozíciu, kde sa má zobraziť na ose y.
      */
-    public Sip(int x, int y) {
-        this.sip = new Obdlznik();
+    public Naboj(int x, int y) {
+        this.naboj = new Kruh();
         this.let = new Manazer();
         this.let.spravujObjekt(this);
-        this.sip.zmenStrany(2, 10);
-        this.sip.zmenFarbu("brown");
-        this.sip.posunVodorovne(-60 + x);
-        this.sip.posunZvisle(-50 + y);
+        this.naboj.zmenPriemer(5);
+        this.naboj.zmenFarbu("brown");
+        this.naboj.posunVodorovne(-20 + x);
+        this.naboj.posunZvisle(-60 + y);
         this.stav = true;
         this.poziciaX = x;
         this.poziciaY = y;
-        this.sip.zobraz();
+        this.naboj.zobraz();
     }
 
     /**
@@ -42,33 +46,68 @@ public class Sip {
             if (this.getPoziciaSipY() < 100) {
                 this.vymazSip();
             } else {
-                this.sip.posunZvisle(-1);
+                this.naboj.posunZvisle(-1);
                 this.poziciaY -= 1;
             }
         } else if (smer.equals(Smer.DOLE)) {
             if (this.getPoziciaSipY() > 600) {
                 this.vymazSip();
             } else {
-                this.sip.posunZvisle(1);
+                this.naboj.posunZvisle(1);
                 this.poziciaY += 1;
             }
         } else if (smer.equals(Smer.VPRAVO)) {
             if (this.getPoziciaSipX() > 800) {
                 this.vymazSip();
             } else {
-                this.sip.posunVodorovne(1);
+                this.naboj.posunVodorovne(1);
                 this.poziciaX += 1;
             }
         } else if (smer.equals(Smer.VLAVO)) {
             if (this.getPoziciaSipX() < 0) {
                 this.vymazSip();
             } else {
-                this.sip.posunVodorovne(-1);
+                this.naboj.posunVodorovne(-1);
                 this.poziciaX -= 1;
+            }
+        } else if (smer.equals(Smer.HORE_VPRAVO)) {
+            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 0) {
+                this.vymazSip();
+            } else {
+                this.naboj.posunZvisle(-1);
+                this.naboj.posunVodorovne(1);
+                this.poziciaX += 1;
+                this.poziciaY -= 1;
+            }
+        } else if (smer.equals(Smer.HORE_VLAVO)) {
+            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 0) {
+                this.vymazSip();
+            } else {
+                this.naboj.posunZvisle(-1);
+                this.naboj.posunVodorovne(-1);
+                this.poziciaX -= 1;
+                this.poziciaY -= 1;
+            }
+        } else if (smer.equals(Smer.DOLE_VPRAVO)) {
+            if (this.getPoziciaSipX() > 800 || this.getPoziciaSipY() > 600) {
+                this.vymazSip();
+            } else {
+                this.naboj.posunZvisle(1);
+                this.naboj.posunVodorovne(1);
+                this.poziciaX += 1;
+                this.poziciaY += 1;
+            }
+        } else if (smer.equals(Smer.DOLE_VLAVO)) {
+            if (this.getPoziciaSipX() > 800 || this.getPoziciaSipY() > 600) {
+                this.vymazSip();
+            } else {
+                this.naboj.posunZvisle(1);
+                this.naboj.posunVodorovne(-1);
+                this.poziciaX -= 1;
+                this.poziciaY += 1;
             }
         }
     }
-
     /**
      * Tik nastaveny na 8ms, ktory vyvoláva metódu vystrel
      */
@@ -79,9 +118,9 @@ public class Sip {
     /**
      * Metóda, ktorá vymení strany obdĺžnika. 
      */
-    public void zmenaStranySipu() {
-        this.sip.zmenStrany(10, 2);
-    }
+//    public void zmenaStranySipu() {
+//        this.naboj.zmenStrany(10, 2);
+//    }
 
     /**
      * Metóda na vrátenie pozície x.
@@ -114,7 +153,7 @@ public class Sip {
      * Metóda, ktorá vymaže šíp.
      */
     public void vymazSip() {
-        this.sip.skry();
+        this.naboj.skry();
         this.let.prestanSpravovatObjekt(this);
         this.stav = false; 
     }

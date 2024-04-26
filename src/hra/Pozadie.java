@@ -1,6 +1,8 @@
+package hra;
+
 import fri.shapesge.Obrazok;
 /**
- * Trieda Pozadie generuje graficky background pre hru.
+ * Trieda hra.Pozadie generuje graficky background pre hru.
  * 
  * @author (your name) 
  * @version (a version number or a date)
@@ -9,7 +11,7 @@ public class Pozadie {
     private Obrazok kolonka;
     private Obrazok pozadie;
     /**
-     * Konštruktor triedy Pozadie.
+     * Konštruktor triedy hra.Pozadie.
      */
     public Pozadie() {
         this.pozadie = new Obrazok("Obrazky\\Pozadie.jpg", 0, 100);

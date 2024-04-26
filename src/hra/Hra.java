@@ -1,4 +1,6 @@
+package hra;
 
+import bytosti.*;
 import fri.shapesge.Manazer;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileWriter;
+
 /**
  * Trieda vytvára kompletnú hru.
  * 
@@ -18,11 +21,12 @@ import java.io.FileWriter;
  */
 public class Hra {
     private Postava postava;
-    private Jelen zver;
+    private Jelen jelen;
+    private Srnka srnka;
     private Manazer manazer;
     private Obtiaznost obtiaznost;
-    private List<Jelen> zvere;
-    private List<Jelen> mrtveZvere;
+    private List<Zver> zvere;
+    private List<Zver> mrtveZvere;
     private int skore;
     private BlokTextu skoreHry;
     private BlokTextu casHry;
@@ -32,8 +36,8 @@ public class Hra {
     private String prezyvkaHraca;
     private Pozadie pozadie;
     /**
-     * Konštruktor triedy Hra. Pridáva parametre do premenných.
-     * Vytvára inštancie tried Postava, Manazer, Zver.
+     * Konštruktor triedy hra.Hra. Pridáva parametre do premenných.
+     * Vytvára inštancie tried bytosti.Postava, Manazer, bytosti.Zver.
      * Vytvára prázdny Arraylist "zvere".
      * 
      * @param obtiaznost určuje čas hry
@@ -43,11 +47,12 @@ public class Hra {
         this.manazer = new Manazer();
         this.pozadie = new Pozadie();
         this.postava = new Postava();
-        this.zver = new Jelen();
+        this.jelen = new Jelen();
+        this.srnka = new Srnka();
         this.zvere = new ArrayList();
         this.mrtveZvere = new ArrayList(); 
         
-        this.zvere.add(this.zver);
+        this.zvere.add(this.jelen);
         this.manazer.spravujObjekt(this.postava);
         this.manazer.spravujObjekt(this);
         
@@ -100,25 +105,25 @@ public class Hra {
     }
     
     /**
-     * Metóda na kontrolu kolízii inštancií tried Sip a Zver.
+     * Metóda na kontrolu kolízii inštancií tried objekty.Sip a bytosti.Zver.
      */
     public void kolizie() {
         for (int i = 0; i < this.postava.getStrely().size(); i++ ) {
             for (int j = 0; j < this.zvere.size(); j++) {
-                if (this.zvere.get(j).getPoziciaZverX() <= this.postava.getStrely().get(i).getPoziciaSipX() && this.postava.getStrely().get(i).getPoziciaSipX() <= this.zvere.get(j).getPoziciaZverX() + 30  
-                    && this.zvere.get(j).getPoziciaZverY() <= this.postava.getStrely().get(i).getPoziciaSipY() && this.postava.getStrely().get(i).getPoziciaSipY() <= this.zvere.get(j).getPoziciaZverY() + 30) {
-                    this.zvere.get(j).zabitaZver();
+                Zver aktualnaZver = this.zvere.get(j);
+                if (aktualnaZver.getPoziciaX() <= this.postava.getStrely().get(i).getPoziciaSipX() && this.postava.getStrely().get(i).getPoziciaSipX() <= aktualnaZver.getPoziciaX() + 30
+                        && aktualnaZver.getPoziciaY() <= this.postava.getStrely().get(i).getPoziciaSipY() && this.postava.getStrely().get(i).getPoziciaSipY() <= aktualnaZver.getPoziciaY() + 30) {
+                    aktualnaZver.zabitaZver();
                     this.postava.getStrely().get(i).vymazSip();
                     this.skore += 10;
                     break;
-                }  
+                }
             }
         }
     }
-    
     /**
      * Tik nastavený na 250ms, ktorý vyvoláva metódy na čistenie ArrayListov, kontroluv kolízii a aktualizáciu skóre.
-     * Každé 2 sekundy vytvára inštanciu triedy Zver a pridáva ju do ArrayListu "zvere". 
+     * Každé 2 sekundy vytvára inštanciu triedy bytosti.Zver a pridáva ju do ArrayListu "zvere".
      * A schová inštancie v Liste "mrtvaZver".
      */
     public void tikHra() {
@@ -126,16 +131,26 @@ public class Hra {
         this.casovacJelena += 1;
         
         if (this.casovac == 8) {
-            this.zver = new Jelen();
-            this.zvere.add(this.zver);
+            this.zvere.add(new Jelen());
+            this.zvere.add(new Srnka());
+        }
+        if (this.casovac == 16) {
+            this.zvere.add(new Vlk());
             this.casovac = 0;
         }
+        /*if (this.skore %  50 == 0 ) {
+            this.zvere.add(new Vlkodlak());
+        }*/
+
+    }
+    public void tikPohyb() {
+        this.postava.pohyb();
         this.mazanieStriel();
         this.mazanieZvere();
         this.kolizie();
         this.aktualizaciaSkore();
         if (this.casovacJelena % 8 == 0) {
-            for (Jelen mrtvaZver : this.mrtveZvere) {
+            for (Zver mrtvaZver : this.mrtveZvere) {
                 mrtvaZver.skryZver();
             }
         }

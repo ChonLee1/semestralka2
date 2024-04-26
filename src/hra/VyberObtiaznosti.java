@@ -1,6 +1,8 @@
+package hra;
+
 import javax.swing.JOptionPane;
 /**
- * Táto trieda slúži na výber obtažností z enumu Obtiaznost.
+ * Táto trieda slúži na výber obtažností z enumu hra.Obtiaznost.
  * 
  * @author Matej Ostrožovič
  * @version (a version number or a date)
@@ -9,7 +11,7 @@ public class VyberObtiaznosti {
     private Obtiaznost obtiaznost;
     private String menoHraca;
     /**
-     * Konštruktor triedy VyberObtiaznosti. 
+     * Konštruktor triedy hra.VyberObtiaznosti.
      */
     public VyberObtiaznosti() {
         this.menoHraca = JOptionPane.showInputDialog(null, "Zadaj svoju prezivku: ");
