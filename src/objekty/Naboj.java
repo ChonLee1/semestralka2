@@ -11,19 +11,21 @@ import hra.Smer;
  * @version (a version number or a date)
  */
 public class Naboj {
+    private final Zbran typZbrane;
     private Kruh naboj;
     private int poziciaX;
     private int poziciaY;
     private Smer smer;
     private Manazer let;
     private boolean stav;
+    private int poskodenie;
     /**
      * Konštruktor triedy objekty.Sip na pozícii zadanej z parametrov x a y.
      * 
      * @param int zadáva pozíciu, kde sa má zobraziť na ose x.
      * @param int zadáva pozíciu, kde sa má zobraziť na ose y.
      */
-    public Naboj(int x, int y) {
+    public Naboj(int x, int y, Zbran zbran) {
         this.naboj = new Kruh();
         this.let = new Manazer();
         this.let.spravujObjekt(this);
@@ -35,6 +37,8 @@ public class Naboj {
         this.poziciaX = x;
         this.poziciaY = y;
         this.naboj.zobraz();
+        this.typZbrane = zbran;
+        this.poskodenie = 1 * this.typZbrane.getPoskodenie();
     }
 
     /**
@@ -71,7 +75,7 @@ public class Naboj {
                 this.poziciaX -= 1;
             }
         } else if (smer.equals(Smer.HORE_VPRAVO)) {
-            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 0) {
+            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 100) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(-1);
@@ -80,7 +84,7 @@ public class Naboj {
                 this.poziciaY -= 1;
             }
         } else if (smer.equals(Smer.HORE_VLAVO)) {
-            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 0) {
+            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 100) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(-1);
@@ -156,5 +160,9 @@ public class Naboj {
         this.naboj.skry();
         this.let.prestanSpravovatObjekt(this);
         this.stav = false; 
+    }
+
+    public int getPoskodenie() {
+        return this.poskodenie;
     }
 }

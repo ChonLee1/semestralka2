@@ -7,21 +7,12 @@ package hra;
  * @version (version number or date here)
  */
 public enum Smer {
-    HORE("hore"),
-    VPRAVO("vpravo"),
-    DOLE("dole"),
-    VLAVO("vlavo"),
-    HORE_VLAVO("horeVlavo"),
-    HORE_VPRAVO("horeVpravo"),
-    DOLE_VLAVO("doleVlavo"),
-    DOLE_VPRAVO("doleVpravo");
-    
-    private final String smer;
-    
-    /**
-     * Konštruktor triedy hra.Smer.
-     */
-    Smer(String smer) {
-        this.smer = smer;
-    }
+    HORE,
+    VPRAVO,
+    DOLE,
+    VLAVO,
+    HORE_VLAVO,
+    HORE_VPRAVO,
+    DOLE_VLAVO,
+    DOLE_VPRAVO;
 }
