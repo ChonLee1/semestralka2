@@ -1,11 +1,13 @@
 package bytosti;
 
+import fri.shapesge.Manazer;
 import fri.shapesge.Obrazok;
 import hra.GeneratorObrazkov;
 import java.util.ArrayList;
 import java.util.Random;
 
-public abstract class Bytosti implements GameObjects, Zver {
+public abstract class Bytosti extends GameObjects implements Zver {
+    private Manazer manazer;
     private boolean urobene;
     private GeneratorObrazkov generatorObrazkov;
     private Obrazok obrazok;
@@ -19,9 +21,12 @@ public abstract class Bytosti implements GameObjects, Zver {
     private ArrayList<String> zoznamObrazkov;
 
     public Bytosti(String obrazok, int zivoty) {
+        super();
         this.generatorObrazkov = new GeneratorObrazkov();
         this.zoznamObrazkov = this.generatorObrazkov.generujObrazok(obrazok);
         this.random = new Random();
+        this.manazer = new Manazer();
+        this.play();
         this.x = this.random.nextInt(450) + 100;
         this.y = this.random.nextInt(450) + 100;
         this.obrazok = new Obrazok(this.zoznamObrazkov.get(0), this.x, this.y);
@@ -57,54 +62,47 @@ public abstract class Bytosti implements GameObjects, Zver {
         this.x += x;
         this.y += y;
         this.smer = smer;
+        this.checkBorders();
     }
 
     public void pohybHore() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(0));
         this.pohyb(0, -1, 0);
-        this.checkBorders();
     }
 
     public void pohybHoreVpravo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(1));
         this.pohyb(1, -1, 1);
-        this.checkBorders();
     }
 
     public void pohybVpravo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(1));
         this.pohyb(1, 0, 2);
-        this.checkBorders();
     }
 
     public void pohybDoleVpravo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(1));
         this.pohyb(1, 1, 3);
-        this.checkBorders();
     }
 
     public void pohybDolu() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(2));
         this.pohyb(0, 1, 4);
-        this.checkBorders();
     }
 
     public void pohybDoleVlavo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(3));
         this.pohyb(-1, 1, 5);
-        this.checkBorders();
     }
 
     public void pohybVlavo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(3));
         this.pohyb(-1, 0, 6);
-        this.checkBorders();
     }
 
     public void pohybHoreVlavo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(3));
         this.pohyb(-1, -1, 7);
-        this.checkBorders();
     }
 
     public void randomPohyb() {
@@ -155,6 +153,16 @@ public abstract class Bytosti implements GameObjects, Zver {
         this.urobene = urobene;
     }
 
+    @Override
+    public int getPoziciaX() {
+        return this.x;
+    }
+
+    @Override
+    public int getPoziciaY() {
+        return this.y;
+    }
+
     public int getSmer() {
         return this.smer;
     }
@@ -162,21 +170,13 @@ public abstract class Bytosti implements GameObjects, Zver {
     public void setSmer(int smer) {
         this.smer = smer;
     }
-    @Override
-    public int getPoziciaX() {
-        return this.x;
-    }
-    @Override
-    public int getPoziciaY() {
-        return this.y;
-    }
-
     public boolean getStav() {
         return this.stav;
     }
 
     public void zabitaZver( ) {
         this.obrazok.zmenObrazok("Obrazky\\mrtvy_jelen.png");
+        this.pause();
         this.stav = false;
     }
 
@@ -192,8 +192,16 @@ public abstract class Bytosti implements GameObjects, Zver {
         this.zivoty -= zivoty;
     }
 
+    public void pause() {
+        this.manazer.prestanSpravovatObjekt(this);
+    }
+
+    public void play() {
+        this.manazer.spravujObjekt(this);
+    }
+
     @Override
     public void zareaguj(int x, int y, String smer) {
-        System.out.println("kolizia");
+
     }
 }

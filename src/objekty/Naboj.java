@@ -4,6 +4,7 @@ import bytosti.Bytosti;
 import bytosti.GameObjects;
 import fri.shapesge.Kruh;
 import fri.shapesge.Manazer;
+import hra.HerneData;
 import hra.Kolizie;
 import hra.Smer;
 
@@ -15,13 +16,15 @@ import java.util.List;
  * @author Matej Ostrožovič
  * @version (a version number or a date)
  */
-public class Naboj implements GameObjects {
+public class Naboj extends GameObjects {
+    private List<Bytosti> zver;
+    private HerneData data;
     private Kolizie kolizia;
     private Kruh naboj;
     private int poziciaX;
     private int poziciaY;
     private Smer smer;
-    private Manazer let;
+    private Manazer manazer;
     private boolean stav;
     private int poskodenie;
     /**
@@ -32,8 +35,8 @@ public class Naboj implements GameObjects {
      */
     public Naboj(int x, int y) {
         this.naboj = new Kruh();
-        this.let = new Manazer();
-        this.let.spravujObjekt(this);
+        this.manazer = new Manazer();
+        this.manazer.spravujObjekt(this);
         this.naboj.zmenPriemer(5);
         this.naboj.zmenFarbu("brown");
         this.naboj.posunVodorovne(-20 + x);
@@ -44,126 +47,97 @@ public class Naboj implements GameObjects {
         this.naboj.zobraz();
         this.poskodenie = 1;
         this.kolizia = new Kolizie();
+        this.data = HerneData.getInstance();
+        this.zver = this.data.getZvere();
     }
-
-    /**
-     * Metóda, ktorá vykresľuje šíp do zadaneho smeru a kontroluje hranice.
-     */
+    public void pohyb(int x, int y) {
+        this.naboj.posunVodorovne(x);
+        this.naboj.posunZvisle(y);
+        this.poziciaX += x;
+        this.poziciaY += y;
+        this.sledovanieHranic();
+    }
+    private void sledovanieHranic() {
+        if (this.poziciaX < 0 || this.poziciaX > 800 || this.poziciaY < 100 || this.poziciaY > 600) {
+            this.vymazSip();
+        }
+    }
     public void vystrel(Smer smer) {
+        this.kolizia(this.zver);
         this.smer = smer;
-        if (smer.equals(Smer.HORE)) {
-            if (this.getPoziciaY() < 100) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(-1);
-                this.poziciaY -= 1;
-            }
-        } else if (smer.equals(Smer.DOLE)) {
-            if (this.getPoziciaY() > 600) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(1);
-                this.poziciaY += 1;
-            }
-        } else if (smer.equals(Smer.VPRAVO)) {
-            if (this.getPoziciaX() > 800) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunVodorovne(1);
-                this.poziciaX += 1;
-            }
-        } else if (smer.equals(Smer.VLAVO)) {
-            if (this.getPoziciaX() < 0) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunVodorovne(-1);
-                this.poziciaX -= 1;
-            }
-        } else if (smer.equals(Smer.HORE_VPRAVO)) {
-            if (this.getPoziciaX() < 0 || this.getPoziciaY() < 100) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(-1);
-                this.naboj.posunVodorovne(1);
-                this.poziciaX += 1;
-                this.poziciaY -= 1;
-            }
-        } else if (smer.equals(Smer.HORE_VLAVO)) {
-            if (this.getPoziciaX() < 0 || this.getPoziciaY() < 100) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(-1);
-                this.naboj.posunVodorovne(-1);
-                this.poziciaX -= 1;
-                this.poziciaY -= 1;
-            }
-        } else if (smer.equals(Smer.DOLE_VPRAVO)) {
-            if (this.getPoziciaX() > 800 || this.getPoziciaY() > 600) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(1);
-                this.naboj.posunVodorovne(1);
-                this.poziciaX += 1;
-                this.poziciaY += 1;
-            }
-        } else if (smer.equals(Smer.DOLE_VLAVO)) {
-            if (this.getPoziciaX() > 800 || this.getPoziciaY() > 600) {
-                this.vymazSip();
-            } else {
-                this.naboj.posunZvisle(1);
-                this.naboj.posunVodorovne(-1);
-                this.poziciaX -= 1;
-                this.poziciaY += 1;
-            }
+        switch (smer) {
+            case HORE:
+                this.pohyb(0, -1);
+                break;
+            case DOLE:
+                this.pohyb(0, 1);
+                break;
+            case VPRAVO:
+                this.pohyb(1, 0);
+                break;
+            case VLAVO:
+                this.pohyb(-1, 0);
+                break;
+            case HORE_VPRAVO:
+                this.pohyb(1, -1);
+                break;
+            case HORE_VLAVO:
+                this.pohyb(-1, -1);
+                break;
+            case DOLE_VPRAVO:
+                this.pohyb(1, 1);
+                break;
+            case DOLE_VLAVO:
+                this.pohyb(-1, 1);
+                break;
         }
     }
     /**
      * Tik nastaveny na 8ms, ktory vyvoláva metódu vystrel
      */
     public void tikSip() {
+        this.zver = this.data.getZvere();
         this.vystrel(this.smer);
     }
+    public int getPoskodenie() {
+        return this.poskodenie;
+    }
+    public void setPoskodenie(int poskodenie) {
+        this.poskodenie = poskodenie;
+    }
+    public void kolizia(List<Bytosti> zvere) {
+        for (Bytosti zviera : zvere) {
+            if (this.kolizia.kolizia(zviera, this)) {
+                zviera.setZivoty(this.poskodenie);
+                if (zviera.getZivoty() == 0) {
+                    if (zviera instanceof bytosti.Vlk) {
+                        this.data.zvysSkore(20);
+                    } else if (zviera instanceof bytosti.Jelen) {
+                        this.data.zvysSkore(10);
+                    } else if (zviera instanceof bytosti.Srnka) {
+                        this.data.zvysSkore(5);
+                    } else if (zviera instanceof bytosti.Vlkodlak) {
+                        this.data.zvysSkore(30);
+                    }
+                    zviera.zabitaZver();
+                    this.vymazSip();
+                    break;
+                }
+                this.vymazSip();
+                break;
+            }
+        }
+    }
 
-    /**
-     * Metóda na vrátenie pozície x.
-     * 
-     * @return int vracia X-ovú pozíciu.
-     */
+    @Override
     public int getPoziciaX() {
         return this.poziciaX;
     }
 
-    /**
-     * Metóda na vrátenie pozície y.
-     * 
-     * @return int vracia Y-ovú pozíciu.
-     */
+    @Override
     public int getPoziciaY() {
         return this.poziciaY;
     }
-
-    public int getPoskodenie() {
-        return this.poskodenie;
-    }
-
-    public void setPoskodenie(int poskodenie) {
-        this.poskodenie = poskodenie;
-    }
-//    public void kolizia(List<Bytosti> zvere) {
-//        for (Bytosti zver : zvere) {
-//            if (this.kolizia.kolizia(zver, this)) {
-//                zver.setZivoty(this.poskodenie);
-//                if (zver.getZivoty() == 0) {
-//                    zver.zabitaZver();
-//                    this.vymazSip();
-//                    break;
-//                }
-//                this.vymazSip();
-//                break;
-//            }
-//        }
-//
-//    }
 
     /**
      * Metóda na vrátenie atribútu stav.
@@ -173,14 +147,21 @@ public class Naboj implements GameObjects {
     public boolean getStav() {
         return this.stav;
     }
-
     /**
      * Metóda, ktorá vymaže šíp.
      */
     public void vymazSip() {
         this.naboj.skry();
-        this.let.prestanSpravovatObjekt(this);
+        this.manazer.prestanSpravovatObjekt(this);
         this.stav = false;
     }
-
+    public void pause() {
+        this.manazer.prestanSpravovatObjekt(this);
+    }
+    public void play() {
+        this.manazer.spravujObjekt(this);
+    }
+    public void zobrazenie() {
+        this.naboj.zobraz();
+    }
 }

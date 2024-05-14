@@ -13,7 +13,8 @@ import objekty.Zbran;
  * @author Matej Ostrožovič 
  * @version 
  */
-public class Postava implements GameObjects {
+public class Postava extends GameObjects {
+
     private Zbran typZbrane;
     private boolean premennaPosunHore;
     private boolean premennaPosunDolu;
@@ -30,6 +31,7 @@ public class Postava implements GameObjects {
      * a prazdny Arraylist striel.
      */
     public Postava() {
+        super();
         this.postava = new Obrazok("Obrazky\\lovec_hore.png", 200, 200);
         this.poziciaX = 200;
         this.poziciaY = 200;
@@ -44,21 +46,6 @@ public class Postava implements GameObjects {
 
         this.typZbrane = new Prak("prak", 1, 1);
     }
-
-    /**
-     * Metóda na vrátenie pozície y.
-     */
-    public int getPoziciaY() {
-        return this.poziciaY; 
-    }
-
-    /**
-     * Metóda na vrátenie pozície x.
-     */
-    public int getPoziciaX() {
-        return this.poziciaX;    
-    }
-
     /**
      * Metóda na vrátenie smeru.
      * 
@@ -92,7 +79,23 @@ public class Postava implements GameObjects {
     public void koniecPohybuVlavo() {
         this.premennaPosunVlavo = false;
     }
+    private void kontrolaHranic() {
+        if (this.poziciaX < 0) {
+            this.poziciaX = 800;
+            this.postava.posunVodorovne(800);
+        } else if (this.poziciaX > 800) {
+            this.poziciaX = 0;
+            this.postava.posunVodorovne(-800);
+        }
 
+        if (this.poziciaY < 100) {
+            this.poziciaY = 600;
+            this.postava.posunZvisle(500);
+        } else if (this.poziciaY > 600) {
+            this.poziciaY = 100;
+            this.postava.posunZvisle(-500);
+        }
+    }
     public void posunPostavy(String obrazok, int x, int y, Smer smer) {
         this.smer = smer;
         this.postava.zmenObrazok(obrazok);
@@ -100,6 +103,7 @@ public class Postava implements GameObjects {
         this.poziciaX += x;
         this.postava.posunVodorovne(x);
         this.postava.posunZvisle(y);
+        this.kontrolaHranic();
     }
 
     public void pohyb() {
@@ -111,10 +115,6 @@ public class Postava implements GameObjects {
             } else {
                 this.posunPostavy("Obrazky\\lovec_hore.png", 0, -3, Smer.HORE);
             }
-            if (this.poziciaY < 100) {
-                this.poziciaY = 600;
-                this.postava.posunZvisle(500);
-            }
         }
         if (this.premennaPosunDolu) {
             if (this.premennaPosunVpravo) {
@@ -125,10 +125,6 @@ public class Postava implements GameObjects {
                 this.posunPostavy("Obrazky\\lovec_dole.png", 0, 3, Smer.DOLE);
             }
 
-            if (this.poziciaY > 600) {
-                this.poziciaY = 100;
-                this.postava.posunZvisle(-500);
-            }
         }
         if (this.premennaPosunVpravo) {
             if (this.premennaPosunHore) {
@@ -137,10 +133,6 @@ public class Postava implements GameObjects {
                 this.posunPostavy("Obrazky\\lovec_vpravo.png", 1, 1, Smer.DOLE_VPRAVO);
             } else {
                 this.posunPostavy("Obrazky\\lovec_vpravo.png", 3, 0, Smer.VPRAVO);
-            }
-            if (this.poziciaX > 800) {
-                this.poziciaX = 0;
-                this.postava.posunVodorovne(-800);
             }
         }
         if (this.premennaPosunVlavo) {
@@ -151,11 +143,17 @@ public class Postava implements GameObjects {
             } else {
                 this.posunPostavy("Obrazky\\lovec_vlavo.png", -3, 0, Smer.VLAVO);
             }
-            if (this.poziciaX < 0) {
-                this.poziciaX = 800;
-                this.postava.posunVodorovne(800);
-            }
         }
+    }
+
+    @Override
+    public int getPoziciaX() {
+        return this.poziciaX;
+    }
+
+    @Override
+    public int getPoziciaY() {
+        return this.poziciaY;
     }
 
     public int getZivoty() {
@@ -173,5 +171,7 @@ public class Postava implements GameObjects {
     public void setTypZbrane(Zbran typZbrane) {
         this.typZbrane = typZbrane;
     }
-
+    public void zobraz() {
+        this.postava.zobraz();
+     }
 }

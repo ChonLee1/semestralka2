@@ -1,7 +1,19 @@
 package bytosti;
 
-public interface GameObjects {
-    int getPoziciaX();
+public abstract class GameObjects {
+    private int poziciaX;
+    private int poziciaY;
 
-    int getPoziciaY();
+    public GameObjects() {
+        this.poziciaX = 0;
+        this.poziciaY = 0;
+    }
+
+    public int getPoziciaY() {
+        return this.poziciaY;
+    }
+
+    public int getPoziciaX() {
+        return this.poziciaX;
+    }
 }

@@ -40,7 +40,6 @@ public class Jelen extends Bytosti  {
     public void zareaguj(int x, int y, String smer) {
         if (!this.isUrobene()) {
             this.zmenaSmeru(smer);
-            System.out.println("kolizia");
         }
     }
 }
