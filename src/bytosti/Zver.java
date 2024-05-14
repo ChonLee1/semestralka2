@@ -1,5 +1,5 @@
 package bytosti;
 
 public interface Zver {
-    void zareaguj();
+    void zareaguj(int x, int y, String smer);
 }

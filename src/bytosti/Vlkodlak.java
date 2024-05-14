@@ -6,7 +6,32 @@ public class Vlkodlak extends Bytosti implements Zver {
     }
 
     @Override
-    public void zareaguj() {
+    public void zareaguj(int x, int y, String smer) {
+        int smerX = x - this.getPoziciaX();
+        int smerY = y - this.getPoziciaY();
 
+        if (smerX > 0) {
+            if (smerY > 0) {
+                this.pohybDoleVpravo();
+            } else if (smerY < 0) {
+                this.pohybHoreVpravo();
+            } else {
+                this.pohybVpravo();
+            }
+        } else if (smerX < 0) {
+            if (smerY > 0) {
+                this.pohybDoleVlavo();
+            } else if (smerY < 0) {
+                this.pohybHoreVlavo();
+            } else {
+                this.pohybVlavo();
+            }
+        } else {
+            if (smerY > 0) {
+                this.pohybDolu();
+            } else if (smerY < 0) {
+                this.pohybHore();
+            }
+        }
     }
 }

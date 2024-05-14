@@ -3,6 +3,7 @@ package hra;
 import bytosti.*;
 import fri.shapesge.Manazer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import objekty.Naboj;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileWriter;
+import java.util.function.Supplier;
 
 /**
  * Trieda vytvára kompletnú hru.
@@ -23,12 +25,17 @@ public class Hunter {
     private Obtiaznost obtiaznost;
     private List<Bytosti> zvere;
     private List<Bytosti> mrtveZvere;
+    private List<Naboj> strely;
     private int skore;
     private int casovac;
     private int cas;
     private int casovacJelena;
     private String prezyvkaHraca;
     private Pozadie pozadie;
+    private Kolizie kolizie;
+    private KontrolaOkolia kontrolaOkolia;
+    private Naboj naboj;
+    private HashMap<Smer, Supplier<Naboj>> smerToNaboj;
     /**
      * Konštruktor triedy hra.Hra. Pridáva parametre do premenných.
      * Vytvára inštancie tried bytosti.Postava, Manazer, bytosti.Zver.
@@ -41,9 +48,12 @@ public class Hunter {
         this.manazer = new Manazer();
         this.pozadie = new Pozadie(this.cas, this.skore);
         this.postava = new Postava();
+        this.kolizie = new Kolizie();
+        this.kontrolaOkolia = new KontrolaOkolia();
 
         this.zvere = new ArrayList();
-        this.mrtveZvere = new ArrayList(); 
+        this.mrtveZvere = new ArrayList();
+        this.strely = new ArrayList();
 
         this.manazer.spravujObjekt(this.postava);
         this.manazer.spravujObjekt(this);
@@ -56,14 +66,25 @@ public class Hunter {
         this.cas = 0;
 
         this.prezyvkaHraca = prezyvka;
+
+        this.smerToNaboj = new HashMap<>();
+        this.smerToNaboj.put(Smer.HORE, () -> new Naboj(this.postava.getPoziciaX() + 15, this.postava.getPoziciaY()));
+        this.smerToNaboj.put(Smer.DOLE, () -> new Naboj(this.postava.getPoziciaX() + 15, this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.HORE_VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.HORE_VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.DOLE_VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
+        this.smerToNaboj.put(Smer.DOLE_VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
+
     }
     /**
      * Metóda na kontrolu stavu strely
      */
     public void mazanieStriel() {
-        for (int i = 0; i < this.postava.getStrely().size(); i++ ) {
-            if (!this.postava.getStrely().get(i).getStav()) {
-                this.postava.getStrely().remove(i);
+        for (int i = 0; i < this.strely.size(); i++ ) {
+            if (!this.strely.get(i).getStav()) {
+                this.strely.remove(i);
             }
         }
     }
@@ -81,15 +102,11 @@ public class Hunter {
     /**
      * Metóda na kontrolu kolízii inštancií tried objekty.Sip a bytosti.Zver.
      */
-    public void kolizie() {
-        List<Naboj> strely = this.postava.getStrely();
-        for (int i = 0; i < strely.size(); i++) {
-            Naboj aktualnaStrela = strely.get(i);
+    public void kolizieStrelyAZvery() {
+        for (int i = 0; i < this.strely.size(); i++) {
+            Naboj aktualnaStrela = this.strely.get(i);
             for (Bytosti aktualnaZver : this.zvere) {
-                if (aktualnaZver.getPoziciaX() <= aktualnaStrela.getPoziciaSipX()
-                        && aktualnaStrela.getPoziciaSipX() <= aktualnaZver.getPoziciaX() + 30
-                        && aktualnaZver.getPoziciaY() <= aktualnaStrela.getPoziciaSipY()
-                        && aktualnaStrela.getPoziciaSipY() <= aktualnaZver.getPoziciaY() + 30) {
+                if (this.kolizie.kolizia(aktualnaZver, aktualnaStrela)) {
                     aktualnaZver.setZivoty(aktualnaStrela.getPoskodenie());
                     if (aktualnaZver.getZivoty() == 0) {
                         aktualnaZver.zabitaZver();
@@ -105,12 +122,34 @@ public class Hunter {
         }
     }
 
+    public void kontrolaOkolia() {
+        for (Bytosti zver : this.zvere) {
+            if (this.kontrolaOkolia.kontrolaOkolia(this.postava, zver)) {
+                zver.zareaguj(this.postava.getPoziciaX(), this.postava.getPoziciaY(), this.postava.getSmer().toString());
+                zver.setUrobene(true);
+            } else {
+                zver.setUrobene(false);
+            }
+        }
+    }
+
     /**
      * Tik nastavený na 250ms, ktorý vyvoláva metódy na čistenie ArrayListov, kontroluv kolízii a aktualizáciu skóre.
      * Každé 2 sekundy vytvára inštanciu triedy bytosti.Zver a pridáva ju do ArrayListu "zvere".
      * A schová inštancie v Liste "mrtvaZver".
      */
-    public void tikHra() {
+    public void tikKolizie() {
+        this.mazanieStriel();
+        this.mazanieZvere();
+        this.kontrolaOkolia();
+        this.kolizieStrelyAZvery();
+//        if (this.naboj != null) {
+//            this.naboj.kolizia(this.zvere);
+//        }
+        this.pozadie.zmenSkore(this.skore);
+    }
+
+    public void tikSpawn() {
         this.casovac += 1;
         this.casovacJelena += 1;
 
@@ -120,13 +159,13 @@ public class Hunter {
             this.manazer.spravujObjekt(jelen);
         }
 
-        if (this.casovac % 8 == 0) {
-            var srnka = new Srnka("Obrazky\\srnka", 1);
-            this.zvere.add(srnka);
-            this.manazer.spravujObjekt(srnka);
-        }
-
-        if (this.casovac % 16 == 0) {
+//        if (this.casovac % 8 == 0) {
+//            var srnka = new Srnka("Obrazky\\srnka", 1);
+//            this.zvere.add(srnka);
+//            this.manazer.spravujObjekt(srnka);
+//        }
+//
+        if (this.casovac == 4) {
             var vlk = new Vlk("Obrazky\\vlk", 3);
             this.zvere.add(vlk);
             this.manazer.spravujObjekt(vlk);
@@ -141,11 +180,6 @@ public class Hunter {
 
     public void tikPohyb() {
         this.postava.pohyb();
-        this.mazanieStriel();
-        this.mazanieZvere();
-
-        this.kolizie();
-        this.pozadie.zmenSkore(this.skore);
     }
 
     /**
@@ -188,6 +222,13 @@ public class Hunter {
     public void tikCas() throws IOException {
         this.odpocitanieCasu();
         this.pozadie.zmenCas(this.cas);
+    }
+
+    public void aktivuj() {
+        this.naboj = this.smerToNaboj.get(this.postava.getSmer()).get();
+        this.naboj.vystrel(this.postava.getSmer());
+        this.strely.add(this.naboj);
+        // TODO: urobit zasobnik a prebijanie do metody aktivuj, pocitadlo na zosobnik a potom pocitadlo na prebytie
     }
 
     public void stop() {

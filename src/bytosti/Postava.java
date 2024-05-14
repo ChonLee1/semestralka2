@@ -2,15 +2,10 @@ package bytosti;
 
 import fri.shapesge.Obrazok;
 import hra.Smer;
-import objekty.Naboj;
 import objekty.Prak;
 import objekty.Zbran;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.List;
-import java.util.function.Supplier;
+
 
 /**
  * Vytvára postavu ktorú hrač dokaže ovladať podľa inputu z klávesnice.
@@ -18,8 +13,7 @@ import java.util.function.Supplier;
  * @author Matej Ostrožovič 
  * @version 
  */
-public class Postava {
-    private HashMap<Smer, Supplier<Naboj>> smerToNaboj;
+public class Postava implements GameObjects {
     private Zbran typZbrane;
     private boolean premennaPosunHore;
     private boolean premennaPosunDolu;
@@ -28,10 +22,8 @@ public class Postava {
     private Obrazok postava;
     private int poziciaX;
     private int poziciaY;
-    private List<Naboj> strely;
+
     private Smer smer;
-    private Naboj naboj;
-    private Random random;
     private int zivoty;
     /**
      * Konštruktor triedy bytosti.Postava, ktory vytvori obrazok lovca na poziciach x= 200 a y= 200
@@ -41,7 +33,6 @@ public class Postava {
         this.postava = new Obrazok("Obrazky\\lovec_hore.png", 200, 200);
         this.poziciaX = 200;
         this.poziciaY = 200;
-        this.strely = new ArrayList();
         this.smer = Smer.HORE;
         this.zivoty = 10;
         this.postava.zobraz();
@@ -51,18 +42,7 @@ public class Postava {
         this.premennaPosunVpravo = false;
         this.premennaPosunVlavo = false;
 
-
         this.typZbrane = new Prak("prak", 1, 1);
-
-        this.smerToNaboj = new HashMap<>();
-        this.smerToNaboj.put(Smer.HORE, () -> new Naboj(this.getPoziciaX() + 15, this.getPoziciaY(), this.typZbrane));
-        this.smerToNaboj.put(Smer.DOLE, () -> new Naboj(this.getPoziciaX() + 15, this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.VLAVO, () -> new Naboj(this.getPoziciaX(), this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.VPRAVO, () -> new Naboj(this.getPoziciaX() + 30, this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.HORE_VPRAVO, () -> new Naboj(this.getPoziciaX() + 30, this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.HORE_VLAVO, () -> new Naboj(this.getPoziciaX(), this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.DOLE_VPRAVO, () -> new Naboj(this.getPoziciaX() + 30, this.getPoziciaY() + 15, this.typZbrane));
-        this.smerToNaboj.put(Smer.DOLE_VLAVO, () -> new Naboj(this.getPoziciaX(), this.getPoziciaY() + 15, this.typZbrane));
     }
 
     /**
@@ -86,15 +66,6 @@ public class Postava {
      */
     public Smer getSmer() {
         return this.smer;
-    }
-
-    /**
-     * Metóda na vrátenie ArrayListu strely.
-     * 
-     * @return List<objekty.Sip> vracia list striel.
-     */
-    public List<Naboj> getStrely() {
-        return this.strely;
     }
 
     public void zaciatokPohybuHore() {
@@ -187,18 +158,20 @@ public class Postava {
         }
     }
 
+    public int getZivoty() {
+        return this.zivoty;
+    }
+
+    public void setZivoty(int zivoty) {
+        this.zivoty = zivoty;
+    }
+
+    public Zbran getTypZbrane() {
+        return this.typZbrane;
+    }
+
     public void setTypZbrane(Zbran typZbrane) {
         this.typZbrane = typZbrane;
     }
 
-    /**
-     * Metóda na vytvorenie inštancie objekty.Sip po stlačení klávesy "Space".
-     * Pridanie danej inštancie do ArrayListu "strely" a posun určený podľa ENUMU "hra.Smer".
-     */
-    public void aktivuj() {
-        this.naboj = this.smerToNaboj.get(this.getSmer()).get();
-        this.naboj.vystrel(this.getSmer());
-        this.strely.add(this.naboj);
-        // TODO: urobit zasobnik a prebijanie do metody aktivuj, pocitadlo na zosobnik a potom pocitadlo na prebytie
-    }
 }

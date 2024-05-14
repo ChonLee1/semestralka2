@@ -1,8 +1,13 @@
 package objekty;
 
+import bytosti.Bytosti;
+import bytosti.GameObjects;
 import fri.shapesge.Kruh;
 import fri.shapesge.Manazer;
+import hra.Kolizie;
 import hra.Smer;
+
+import java.util.List;
 
 /**
  * Trieda ktora vytvara sip.
@@ -10,8 +15,8 @@ import hra.Smer;
  * @author Matej Ostrožovič
  * @version (a version number or a date)
  */
-public class Naboj {
-    private final Zbran typZbrane;
+public class Naboj implements GameObjects {
+    private Kolizie kolizia;
     private Kruh naboj;
     private int poziciaX;
     private int poziciaY;
@@ -25,7 +30,7 @@ public class Naboj {
      * @param int zadáva pozíciu, kde sa má zobraziť na ose x.
      * @param int zadáva pozíciu, kde sa má zobraziť na ose y.
      */
-    public Naboj(int x, int y, Zbran zbran) {
+    public Naboj(int x, int y) {
         this.naboj = new Kruh();
         this.let = new Manazer();
         this.let.spravujObjekt(this);
@@ -37,8 +42,8 @@ public class Naboj {
         this.poziciaX = x;
         this.poziciaY = y;
         this.naboj.zobraz();
-        this.typZbrane = zbran;
-        this.poskodenie = 1 * this.typZbrane.getPoskodenie();
+        this.poskodenie = 1;
+        this.kolizia = new Kolizie();
     }
 
     /**
@@ -47,35 +52,35 @@ public class Naboj {
     public void vystrel(Smer smer) {
         this.smer = smer;
         if (smer.equals(Smer.HORE)) {
-            if (this.getPoziciaSipY() < 100) {
+            if (this.getPoziciaY() < 100) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(-1);
                 this.poziciaY -= 1;
             }
         } else if (smer.equals(Smer.DOLE)) {
-            if (this.getPoziciaSipY() > 600) {
+            if (this.getPoziciaY() > 600) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(1);
                 this.poziciaY += 1;
             }
         } else if (smer.equals(Smer.VPRAVO)) {
-            if (this.getPoziciaSipX() > 800) {
+            if (this.getPoziciaX() > 800) {
                 this.vymazSip();
             } else {
                 this.naboj.posunVodorovne(1);
                 this.poziciaX += 1;
             }
         } else if (smer.equals(Smer.VLAVO)) {
-            if (this.getPoziciaSipX() < 0) {
+            if (this.getPoziciaX() < 0) {
                 this.vymazSip();
             } else {
                 this.naboj.posunVodorovne(-1);
                 this.poziciaX -= 1;
             }
         } else if (smer.equals(Smer.HORE_VPRAVO)) {
-            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 100) {
+            if (this.getPoziciaX() < 0 || this.getPoziciaY() < 100) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(-1);
@@ -84,7 +89,7 @@ public class Naboj {
                 this.poziciaY -= 1;
             }
         } else if (smer.equals(Smer.HORE_VLAVO)) {
-            if (this.getPoziciaSipX() < 0 || this.getPoziciaSipY() < 100) {
+            if (this.getPoziciaX() < 0 || this.getPoziciaY() < 100) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(-1);
@@ -93,7 +98,7 @@ public class Naboj {
                 this.poziciaY -= 1;
             }
         } else if (smer.equals(Smer.DOLE_VPRAVO)) {
-            if (this.getPoziciaSipX() > 800 || this.getPoziciaSipY() > 600) {
+            if (this.getPoziciaX() > 800 || this.getPoziciaY() > 600) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(1);
@@ -102,7 +107,7 @@ public class Naboj {
                 this.poziciaY += 1;
             }
         } else if (smer.equals(Smer.DOLE_VLAVO)) {
-            if (this.getPoziciaSipX() > 800 || this.getPoziciaSipY() > 600) {
+            if (this.getPoziciaX() > 800 || this.getPoziciaY() > 600) {
                 this.vymazSip();
             } else {
                 this.naboj.posunZvisle(1);
@@ -120,18 +125,11 @@ public class Naboj {
     }
 
     /**
-     * Metóda, ktorá vymení strany obdĺžnika. 
-     */
-//    public void zmenaStranySipu() {
-//        this.naboj.zmenStrany(10, 2);
-//    }
-
-    /**
      * Metóda na vrátenie pozície x.
      * 
      * @return int vracia X-ovú pozíciu.
      */
-    public int getPoziciaSipX() {
+    public int getPoziciaX() {
         return this.poziciaX;
     }
 
@@ -140,13 +138,36 @@ public class Naboj {
      * 
      * @return int vracia Y-ovú pozíciu.
      */
-    public int getPoziciaSipY() {
+    public int getPoziciaY() {
         return this.poziciaY;
     }
 
+    public int getPoskodenie() {
+        return this.poskodenie;
+    }
+
+    public void setPoskodenie(int poskodenie) {
+        this.poskodenie = poskodenie;
+    }
+//    public void kolizia(List<Bytosti> zvere) {
+//        for (Bytosti zver : zvere) {
+//            if (this.kolizia.kolizia(zver, this)) {
+//                zver.setZivoty(this.poskodenie);
+//                if (zver.getZivoty() == 0) {
+//                    zver.zabitaZver();
+//                    this.vymazSip();
+//                    break;
+//                }
+//                this.vymazSip();
+//                break;
+//            }
+//        }
+//
+//    }
+
     /**
      * Metóda na vrátenie atribútu stav.
-     * 
+     *
      * @return boolean vracia stav šípu.
      */
     public boolean getStav() {
@@ -159,10 +180,7 @@ public class Naboj {
     public void vymazSip() {
         this.naboj.skry();
         this.let.prestanSpravovatObjekt(this);
-        this.stav = false; 
+        this.stav = false;
     }
 
-    public int getPoskodenie() {
-        return this.poskodenie;
-    }
 }

@@ -5,7 +5,8 @@ import hra.GeneratorObrazkov;
 import java.util.ArrayList;
 import java.util.Random;
 
-public abstract class Bytosti {
+public abstract class Bytosti implements GameObjects, Zver {
+    private boolean urobene;
     private GeneratorObrazkov generatorObrazkov;
     private Obrazok obrazok;
     private Random random;
@@ -28,6 +29,7 @@ public abstract class Bytosti {
         this.stav = true;
         this.casZmeni = 0;
         this.zivoty = zivoty;
+        this.urobene = false;
         this.obrazok.zobraz();
     }
 
@@ -95,7 +97,7 @@ public abstract class Bytosti {
 
     public void pohybVlavo() {
         this.obrazok.zmenObrazok(this.zoznamObrazkov.get(3));
-        this.pohyb(-1, 0, 3);
+        this.pohyb(-1, 0, 6);
         this.checkBorders();
     }
 
@@ -136,17 +138,35 @@ public abstract class Bytosti {
 
     public void tikZver() {
         this.randomPohyb();
-        this.casZmeni += 1;
-        if (this.casZmeni == 100) {
-            this.smer = this.random.nextInt(4);
-            this.casZmeni = 0;
+        if (!this.urobene) {
+            this.casZmeni += 1;
+            if (this.casZmeni == 100) {
+                this.smer = this.random.nextInt(8);
+                this.casZmeni = 0;
+            }
         }
     }
 
+    public boolean isUrobene() {
+        return this.urobene;
+    }
+
+    public void setUrobene(boolean urobene) {
+        this.urobene = urobene;
+    }
+
+    public int getSmer() {
+        return this.smer;
+    }
+
+    public void setSmer(int smer) {
+        this.smer = smer;
+    }
+    @Override
     public int getPoziciaX() {
         return this.x;
     }
-
+    @Override
     public int getPoziciaY() {
         return this.y;
     }
@@ -172,11 +192,8 @@ public abstract class Bytosti {
         this.zivoty -= zivoty;
     }
 
-    public void changeDirection() {
-        int newDirection;
-        do {
-            newDirection = this.random.nextInt(8);
-        } while (newDirection == this.smer);
-        this.smer = newDirection;
+    @Override
+    public void zareaguj(int x, int y, String smer) {
+        System.out.println("kolizia");
     }
 }
