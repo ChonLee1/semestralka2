@@ -2,16 +2,12 @@ package hra;
 
 import bytosti.*;
 import fri.shapesge.Manazer;
-import java.util.HashMap;
 import java.util.List;
-import objekty.Naboj;
 import java.io.IOException;
 import java.util.Scanner;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileWriter;
-import java.util.function.Supplier;
-
 /**
  * Trieda vytvára kompletnú hru.
  * 
@@ -30,8 +26,6 @@ public class Hunter {
     private String prezyvkaHraca;
     private Pozadie pozadie;
     private KontrolaOkolia kontrolaOkolia;
-    private Naboj naboj;
-    private HashMap<Smer, Supplier<Naboj>> smerToNaboj;
     /**
      * Konštruktor triedy hra.Hra. Pridáva parametre do premenných.
      * Vytvára inštancie tried bytosti.Postava, Manazer, bytosti.Zver.
@@ -44,11 +38,13 @@ public class Hunter {
         this.manazer = new Manazer();
         this.data = HerneData.getInstance();
         this.pozadie = new Pozadie(this.data.getCas(), this.data.getSkore());
-        this.postava = new Postava();
+        this.postava = Postava.getInstance();
+
         this.kontrolaOkolia = new KontrolaOkolia();
 
         this.zvere = this.data.getZvere();
         this.mrtveZvere = this.data.getMrtveZvere();
+        this.data.setPostava(this.postava);
 
         this.manazer.spravujObjekt(this.postava);
         this.manazer.spravujObjekt(this);
@@ -57,16 +53,6 @@ public class Hunter {
         this.casovacJelena = 0;
 
         this.prezyvkaHraca = prezyvka;
-
-        this.smerToNaboj = new HashMap<>();
-        this.smerToNaboj.put(Smer.HORE, () -> new Naboj(this.postava.getPoziciaX() + 15, this.postava.getPoziciaY()));
-        this.smerToNaboj.put(Smer.DOLE, () -> new Naboj(this.postava.getPoziciaX() + 15, this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.HORE_VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.HORE_VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.DOLE_VPRAVO, () -> new Naboj(this.postava.getPoziciaX() + 30, this.postava.getPoziciaY() + 15));
-        this.smerToNaboj.put(Smer.DOLE_VLAVO, () -> new Naboj(this.postava.getPoziciaX(), this.postava.getPoziciaY() + 15));
     }
     /**
      * Metóda na kontrolu stavu zvery.
@@ -164,12 +150,6 @@ public class Hunter {
     public void tikCas() throws IOException {
         this.data.zvysCas();
         this.pozadie.zmenCas(this.data.getCas());
-    }
-    public void aktivuj() {
-        this.naboj = this.smerToNaboj.get(this.postava.getSmer()).get();
-        this.naboj.zobrazenie();
-        this.naboj.vystrel(this.postava.getSmer());
-        // TODO: urobit zasobnik a prebijanie do metody aktivuj, pocitadlo na zosobnik a potom pocitadlo na prebytie
     }
     public void stop() {
         this.manazer.prestanSpravovatObjekt(this);

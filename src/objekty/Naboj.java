@@ -2,6 +2,7 @@ package objekty;
 
 import bytosti.Bytosti;
 import bytosti.GameObjects;
+import bytosti.Postava;
 import fri.shapesge.Kruh;
 import fri.shapesge.Manazer;
 import hra.HerneData;
@@ -18,6 +19,8 @@ import java.util.List;
  */
 public class Naboj extends GameObjects {
     private List<Bytosti> zver;
+    private List<Postava> charakter;
+    private Zbran typZbrane;
     private HerneData data;
     private Kolizie kolizia;
     private Kruh naboj;
@@ -34,6 +37,10 @@ public class Naboj extends GameObjects {
      * @param int zadáva pozíciu, kde sa má zobraziť na ose y.
      */
     public Naboj(int x, int y) {
+        this.data = HerneData.getInstance();
+        this.zver = this.data.getZvere();
+        this.charakter = this.data.getPostava();
+        this.typZbrane = this.charakter.get(0).getTypZbrane();
         this.naboj = new Kruh();
         this.manazer = new Manazer();
         this.manazer.spravujObjekt(this);
@@ -45,10 +52,8 @@ public class Naboj extends GameObjects {
         this.poziciaX = x;
         this.poziciaY = y;
         this.naboj.zobraz();
-        this.poskodenie = 1;
+        this.poskodenie = this.typZbrane.getPoskodenie();
         this.kolizia = new Kolizie();
-        this.data = HerneData.getInstance();
-        this.zver = this.data.getZvere();
     }
     public void pohyb(int x, int y) {
         this.naboj.posunVodorovne(x);
@@ -102,14 +107,11 @@ public class Naboj extends GameObjects {
     public int getPoskodenie() {
         return this.poskodenie;
     }
-    public void setPoskodenie(int poskodenie) {
-        this.poskodenie = poskodenie;
-    }
     public void kolizia(List<Bytosti> zvere) {
         for (Bytosti zviera : zvere) {
             if (this.kolizia.kolizia(zviera, this)) {
                 zviera.setZivoty(this.poskodenie);
-                if (zviera.getZivoty() == 0) {
+                if (zviera.getZivoty() <= 0) {
                     if (zviera instanceof bytosti.Vlk) {
                         this.data.zvysSkore(20);
                     } else if (zviera instanceof bytosti.Jelen) {
@@ -138,7 +140,6 @@ public class Naboj extends GameObjects {
     public int getPoziciaY() {
         return this.poziciaY;
     }
-
     /**
      * Metóda na vrátenie atribútu stav.
      *
@@ -146,6 +147,9 @@ public class Naboj extends GameObjects {
      */
     public boolean getStav() {
         return this.stav;
+    }
+    public void setPolomer(int polomer) {
+        this.naboj.zmenPriemer(polomer);
     }
     /**
      * Metóda, ktorá vymaže šíp.

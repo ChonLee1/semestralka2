@@ -2,6 +2,7 @@ package bytosti;
 
 import fri.shapesge.Obrazok;
 import hra.Smer;
+import objekty.Brokovnica;
 import objekty.Prak;
 import objekty.Zbran;
 
@@ -14,7 +15,7 @@ import objekty.Zbran;
  * @version 
  */
 public class Postava extends GameObjects {
-
+    private static Postava instance;
     private Zbran typZbrane;
     private boolean premennaPosunHore;
     private boolean premennaPosunDolu;
@@ -30,7 +31,7 @@ public class Postava extends GameObjects {
      * Konštruktor triedy bytosti.Postava, ktory vytvori obrazok lovca na poziciach x= 200 a y= 200
      * a prazdny Arraylist striel.
      */
-    public Postava() {
+    private Postava() {
         super();
         this.postava = new Obrazok("Obrazky\\lovec_hore.png", 200, 200);
         this.poziciaX = 200;
@@ -44,7 +45,13 @@ public class Postava extends GameObjects {
         this.premennaPosunVpravo = false;
         this.premennaPosunVlavo = false;
 
-        this.typZbrane = new Prak("prak", 1, 1);
+        this.typZbrane = new Brokovnica();
+    }
+    public static Postava getInstance() {
+        if (instance == null) {
+            instance = new Postava();
+        }
+        return instance;
     }
     /**
      * Metóda na vrátenie smeru.
@@ -173,5 +180,5 @@ public class Postava extends GameObjects {
     }
     public void zobraz() {
         this.postava.zobraz();
-     }
+    }
 }

@@ -3,9 +3,9 @@ package hra;
 import bytosti.GameObjects;
 
 public class KontrolaOkolia {
-    private int vzdialenost;
+    private final int vzdialenost = 120;
+
     public KontrolaOkolia() {
-        this.vzdialenost = 120;
     }
     public boolean kontrolaOkolia(GameObjects objekt1, GameObjects objekt2) {
         double deltaX = objekt1.getPoziciaX() - objekt2.getPoziciaX();
